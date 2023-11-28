@@ -64,9 +64,17 @@ async def predict_api(request: Request,image_files: List[UploadFile] = File(...)
         db.add(categoreyes)
     db.commit()
     
-    return RedirectResponse(url=app.url_path_for("predict"), status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(url=app.url_path_for("show_image"), status_code=status.HTTP_303_SEE_OTHER)
 
-
+@app.get("/show_image")
+async def show_image(request: Request,db: Session = Depends(get_db)):
+    categoreyes_list = db.query(models.Categoreyes).all()
+    show_list = []
+    for img in categoreyes_list:
+        image_data = base64.b64encode(img.data).decode('utf-8')
+        show_list.append(image_data)
+    return templates.TemplateResponse("show_image.html",
+                                      {"request": request,"show_list":show_list})    
 
 @app.get("/predict")
 async def predict(request: Request, db: Session = Depends(get_db)):

@@ -118,7 +118,7 @@
                 // 서버 응답을 확인하고 이에 따른 동작 수행
                 if (response.ok) {
                     // 업로드가 성공하면 /predict 페이지로 이동
-                    window.location.href = "/predict";
+                    window.location.href = "/show_image";
                 } else {
                     // 업로드 실패 시 적절한 처리를 수행
                     console.error('Error during file upload. Server returned:', response.status);

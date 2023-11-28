@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button onclick="window.location.href='/predict'">Classification</button>
+
+    {% for image_ in show_list %}
+        <img src="data:image/png;base64,{{ image_|b64encode }}">
+
+    {% endfor %}
+</body>
+</html>
