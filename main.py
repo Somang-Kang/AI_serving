@@ -28,10 +28,10 @@ models.Base.metadata.create_all(bind=engine)
 
 #Define categories
 class_name = ["a photo of a food","a photo of a landscape", "a photo of a person","a photo of people", 
-              "a photo of a document", "a photo of an animal", "a photo of people in landscape","a photo of nature"]
+              "a photo of a document", "a photo of an animal","a photo of animals", "a photo of people in landscape","a photo of nature"]
 
 class_dict = {"a photo of a food":"food","a photo of a landscape":"nature", "a photo of a person":"human","a photo of people":"human", 
-              "a photo of a document":"docs", "a photo of an animal":"animal","a photo of people in landscape":"human","a photo of nature":"nature"}
+              "a photo of a document":"docs", "a photo of an animal":"animal","a photo of animals":"animal","a photo of people in landscape":"human","a photo of nature":"nature","others":"others"}
 
 
 
@@ -93,12 +93,15 @@ async def predict(request: Request, db: Session = Depends(get_db)):
         outputs = model(**inputs)
         logits_per_image = outputs.logits_per_image  # this is the image-text similarity score
         probs = logits_per_image.softmax(dim=1)  # we can take the softmax to get the label probabilities
-
-        result = class_dict[class_name[probs.argmax()]]
+        if max(probs.tolist()[0])>0.45:
+            result = class_dict[class_name[probs.argmax()]]
+        else:
+            result = "others"
         image_data = base64.b64encode(categoreyes.data).decode('utf-8')
 
         predictions.append({"filename": categoreyes.filename, "result": result,"img":image_data})
         classified[result].append(image_data)
+
 
     #해당 카테고리에 파일이 없다면 폴더 보이지 않도록 삭제
     delete_keys = []

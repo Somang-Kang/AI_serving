@@ -1,16 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <style>
+            body {
+                text-align: center;
+            }
+    
+            button {
+                margin-top: 20px;
+                padding: 10px 20px;
+                font-size: 16px;
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+    
+            button:hover {
+                background-color: #45a049;
+            }
+    
+            .image-container {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-top: 20px;
+            }
+    
+            .image-container img {
+                margin: 10px;
+                width: 128px;
+                height: 128px;
+                object-fit: cover;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                transition: 0.3s;
+            }
+    
+            .image-container img:hover {
+                border: 1px solid #4CAF50;
+            }
+        </style>
+    </head>
 <body>
     <button onclick="window.location.href='/predict'">Classification</button>
 
-    {% for image_ in show_list %}
-        <img src="data:image/png;base64,{{ image_|b64encode }}">
-
-    {% endfor %}
+    <div class="image-container">
+        {% for image_ in show_list %}
+            <img src="data:image/png;base64,{{ image_|b64encode }}">
+        {% endfor %}
+    </div>
 </body>
 </html>

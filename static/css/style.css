@@ -1,64 +1,62 @@
-
-*{
-    
+* {
     padding: 0;
     margin: 0 auto;
-    
 }
-a{
+
+a {
     text-decoration: none;
     color: black;
 }
 
 /* header */
-
-header{
+header {
     background: #98B1F6;
     height: 70px;
 }
 
-.logo{
+.logo {
     text-align: center;
     padding-block: 15px;
 }
 
-
-
 /* main */
-
-main{
+main {
     width: 100%;
-    height: 90vh;
+    height: 100vh;
     position: relative;
 }
 
-.con_logo{
+
+.con_logo {
     position: absolute;
     top: 25%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
-.content{
+.content {
     position: absolute;
-    top: 40%;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    width: 80%; /* Adjust the width as needed */
+    max-width: 800px; /* Set a maximum width if desired */
+    max-height: 80vh;
+    overflow-y: auto;
+    border: 1px solid #ddd;
 }
-.content input{
-    width: 40vw;
+.content input {
+    width: 100%;
     height: 50px;
     border-radius: 10px;
     padding-left: 10px;
 }
 
-
-
-.content button{
+.content button {
     position: absolute;
     right: 50%;
     transform: translate(50%, -65%);
-    width: 80px;
-    height: 30px;
+    width: 120px;
+    height: 40px;
     border-radius: 10px;
     background: #5F83B9;
     border: none;
@@ -68,9 +66,27 @@ main{
     cursor: pointer;
 }
 
+.image-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.image-container img {
+    margin: 10px;
+    width: 128px;
+    height: 128px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+.image-container img:hover {
+    border: 1px solid #4CAF50;
+}
+
 .dropzone {
-    /* position: absolute;
-    top: 100px; */
     background: white;
     border-radius: 5px;
     border: 2px dashed rgb(0, 135, 247);
@@ -80,7 +96,7 @@ main{
     margin-right: auto;
 }
 
-.dz-remove{
+.dz-remove {
     background: red;
     width: 50px;
     border-radius: 25px;
