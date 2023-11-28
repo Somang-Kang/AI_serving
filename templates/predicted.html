@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% for result in predictions %}
+        <p id="prediction">{{ result['filename'] }}: {{ result['result'] }}</p>
+        <img src="data:image/png;base64,{{ result['img']|b64encode  }}" alt="{{ result['filename'] }}">
+
+    {% endfor %}
+
+    {% for key, value in classified.items() %}
+        <p>Key: {{ key }}, Value: {{ value }}</p>
+    {% endfor %}
+</body>
+</html>

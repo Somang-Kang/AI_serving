@@ -1,0 +1,6 @@
+
+# ignore all files in the images/ directory
+images/
+
+# ignore all sqlite3 files
+*.sqlite3
