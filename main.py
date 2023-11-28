@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, Form, Request, Depends, status
+from fastapi import FastAPI, File, HTTPException, UploadFile, Form, Request, Depends, status
 from fastapi.responses import RedirectResponse
 
 from fastapi.templating import Jinja2Templates
@@ -30,10 +30,8 @@ models.Base.metadata.create_all(bind=engine)
 class_name = ["a photo of a food","a photo of a landscape", "a photo of a person","a photo of people", 
               "a photo of a document", "a photo of an animal", "a photo of people in landscape","a photo of nature"]
 
-class_dict = {"a photo of a food":"food","a photo of a landscape":"landscape", "a photo of a person":"human","a photo of people":"human", 
+class_dict = {"a photo of a food":"food","a photo of a landscape":"nature", "a photo of a person":"human","a photo of people":"human", 
               "a photo of a document":"docs", "a photo of an animal":"animal","a photo of people in landscape":"human","a photo of nature":"nature"}
-
-
 
 
 
@@ -43,6 +41,7 @@ templates.env.filters["b64encode"] = lambda data: data.encode("utf-8").decode("u
 
 # FastAPI() 객체 생성
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 def get_db():
     db = SessionLocal()
@@ -56,23 +55,24 @@ def get_db():
 async def home(request: Request):
     return templates.TemplateResponse("index.html",{"request":request})
 
-@app.post("/send_image")
+@app.post("/upload")
 async def predict_api(request: Request,image_files: List[UploadFile] = File(...),db: Session = Depends(get_db)):
     for image_file in image_files:
         image_data = await image_file.read()
         filename = image_file.filename
         categoreyes = models.Categoreyes(data=image_data, filename=filename)
-        
         db.add(categoreyes)
-        
     db.commit()
+    
     return RedirectResponse(url=app.url_path_for("predict"), status_code=status.HTTP_303_SEE_OTHER)
+
+
 
 @app.get("/predict")
 async def predict(request: Request, db: Session = Depends(get_db)):
     categoreyes_list = db.query(models.Categoreyes).all()
     predictions = []
-    classified = {"human":[],"landscape":[],"food":[],"docs":[],"animal":[],"others":[]}
+    classified = {"human":[],"nature":[],"food":[],"docs":[],"animal":[],"others":[]}
     for idx in range(len(categoreyes_list)):
         categoreyes=categoreyes_list[idx]
         # 1. make buffer from bytes
@@ -90,7 +90,15 @@ async def predict(request: Request, db: Session = Depends(get_db)):
         image_data = base64.b64encode(categoreyes.data).decode('utf-8')
 
         predictions.append({"filename": categoreyes.filename, "result": result,"img":image_data})
-        classified[result].append(idx)
+        classified[result].append(image_data)
+
+    #해당 카테고리에 파일이 없다면 폴더 보이지 않도록 삭제
+    delete_keys = []
+    for classs_key in classified.keys():
+        if len(classified[classs_key])==0:
+            delete_keys.append(classs_key)
+    for k in delete_keys:      
+        classified.pop(k, None)
 
     return templates.TemplateResponse("predicted.html",
                                       {"request": request,

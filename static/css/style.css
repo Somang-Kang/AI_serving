@@ -21,9 +21,7 @@ header{
     text-align: center;
     padding-block: 15px;
 }
-.logo a{
-   
-}
+
 
 
 /* main */
@@ -53,11 +51,12 @@ main{
     padding-left: 10px;
 }
 
+
+
 .content button{
     position: absolute;
-    right: 2.5%;
-    top: 50%;
-    transform: translate(5%, -50%);
+    right: 50%;
+    transform: translate(50%, -65%);
     width: 80px;
     height: 30px;
     border-radius: 10px;
@@ -67,4 +66,24 @@ main{
     font-family: 'Inika', serif;
     font-size: 18px;
     cursor: pointer;
+}
+
+.dropzone {
+    /* position: absolute;
+    top: 100px; */
+    background: white;
+    border-radius: 5px;
+    border: 2px dashed rgb(0, 135, 247);
+    border-image: none;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.dz-remove{
+    background: red;
+    width: 50px;
+    border-radius: 25px;
+    color: white;
+    margin-top: 10px;
 }

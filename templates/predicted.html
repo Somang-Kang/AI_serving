@@ -8,12 +8,16 @@
 <body>
     {% for result in predictions %}
         <p id="prediction">{{ result['filename'] }}: {{ result['result'] }}</p>
-        <img src="data:image/png;base64,{{ result['img']|b64encode  }}" alt="{{ result['filename'] }}">
+        <!-- <img src="data:image/png;base64,{{ result['img']|b64encode  }}" alt="{{ result['filename'] }}"> -->
 
     {% endfor %}
 
     {% for key, value in classified.items() %}
-        <p>Key: {{ key }}, Value: {{ value }}</p>
+        <p>Key: {{ key }}</p>
+        {% for v in value %}
+            <img src="data:image/png;base64,{{ v|b64encode  }}" >
+        {% endfor %}
+
     {% endfor %}
 </body>
 </html>

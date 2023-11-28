@@ -18,7 +18,7 @@
     </header>
     <main>
         <div class="con_logo">
-            <img src="static/img/logo.png" alt="로고">
+            <img src="img/logo.png" alt="로고">
         </div>
         <div class="content">
            
@@ -26,15 +26,14 @@
             <section>
 
                 <DIV id="dropzone">
-                    <FORM class="c_drop dropzone needsclick" id="demo-upload" method="post" action="/upload" enctype="multipart/form-data" onsubmit="return uploadFiles()">
+                    <FORM class="c_drop dropzone needsclick" id="demo-upload" action="/upload" enctype="multipart/form-data">
                       <DIV class="dz-message needsclick">    
                         Drop files here or click to upload.<BR>
                         <SPAN class="note needsclick">(This is just a demo dropzone. Selected 
                         files are <STRONG>not</STRONG> actually uploaded.)</SPAN>
                       </DIV>
-                      <button type="submit">upload</button>
-
                     </FORM>
+                    <button type="submit" form="demo-upload">upload</button>
 
                   </DIV>
             </section>
@@ -100,36 +99,6 @@
             }
         
         });
-
-        function uploadFiles() {
-            // Dropzone가 관리하는 파일들을 FormData에 추가
-            var formData = new FormData();
-            dropzone.files.forEach(function(file) {
-                formData.append('image_files', file);
-            });
-
-            // Dropzone에서 파일 업로드 시작
-            // dropzone.processQueue();
-            // 서버로 파일 업로드 요청
-            fetch('/upload', {
-                method: 'POST',
-                body: formData
-            }).then(response => {
-                // 서버 응답을 확인하고 이에 따른 동작 수행
-                if (response.ok) {
-                    // 업로드가 성공하면 /predict 페이지로 이동
-                    window.location.href = "/predict";
-                } else {
-                    // 업로드 실패 시 적절한 처리를 수행
-                    console.error('Error during file upload. Server returned:', response.status);
-                    // 여기에 실패했을 때 사용자에게 보여줄 메시지 등을 추가할 수 있습니다.
-                }
-            }).catch(error => {
-                console.error('Error during file upload:', error);
-            });
-
-            return false;
-        }
         
         // Now fake the file upload, since GitHub does not handle file uploads
         // and returns a 404
