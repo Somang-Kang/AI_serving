@@ -30,6 +30,22 @@
             border-radius: 5px;
         }
 
+        .category-box a {
+            text-decoration: none;
+            color: inherit; /* Inherit text color from parent */
+            display: block; /* Make the entire area clickable */
+            padding: 10px; /* Adjust padding as needed */
+            border-radius: 5px;
+            background-color: #ffffff;
+            color: rgb(0, 0, 0);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .category-box a:hover {
+            background-color: #ffffff;
+        }
+
         .category-box p {
             margin: 0;
             font-weight: bold;
@@ -60,15 +76,24 @@
     <title>Document</title>
 </head>
 <body>
-    <button onclick="window.location.href='/save_images'" class="save-button">Save All</button>
+    <button onclick="window.location.href='/save_images'" class="save-button">Save All Folders</button>
     {% for key, value in classified.items() %}
         <div class="category-box">
-            <p>{{ key }}</p>
-            <div class="image-container">
+            <a href="{% if key == 'human' %}/human_images
+                        {% elif key == 'animal' %}/animal_images
+                        {% elif key == 'docs' %}/docs_images
+                        {% elif key == 'nature' %}/nature_images
+                        {% elif key == 'others' %}/others_images
+                        {% elif key == 'food' %}/food_images
+                        {% endif %}">
+                <p>{{ key }}</p>
+                <!-- Add other content here if needed -->
+            </a>
+            <!-- <div class="image-container">
                 {% for v in value %}
                     <img src="data:image/png;base64,{{ v|b64encode }}" >
                 {% endfor %}
-            </div>
+            </div> -->
         </div>
     {% endfor %}
 </body>

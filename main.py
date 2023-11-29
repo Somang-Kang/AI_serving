@@ -1,5 +1,6 @@
+import shutil
 from fastapi import FastAPI, File, HTTPException, UploadFile, Form, Request, Depends, status
-from fastapi.responses import RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse
 
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -93,14 +94,25 @@ async def predict(request: Request, db: Session = Depends(get_db)):
         outputs = model(**inputs)
         logits_per_image = outputs.logits_per_image  # this is the image-text similarity score
         probs = logits_per_image.softmax(dim=1)  # we can take the softmax to get the label probabilities
+        image_data = base64.b64encode(categoreyes.data).decode('utf-8')
+        
+
         if max(probs.tolist()[0])>0.45:
             result = class_dict[class_name[probs.argmax()]]
+            if result =="human": db.add(models.Human(data=categoreyes.data, filename=categoreyes.filename))
+            elif result == "nature": db.add(models.Nature(data=categoreyes.data, filename=categoreyes.filename))
+            elif result == "food": db.add(models.Food(data=categoreyes.data, filename=categoreyes.filename))
+            elif result == "docs": db.add(models.Docs(data=categoreyes.data, filename=categoreyes.filename))
+            elif result == "animal": db.add(models.Animal(data=categoreyes.data, filename=categoreyes.filename))
+
         else:
             result = "others"
-        image_data = base64.b64encode(categoreyes.data).decode('utf-8')
-
+            db.add(models.Others(data=categoreyes.data, filename=categoreyes.filename))
+        
         predictions.append({"filename": categoreyes.filename, "result": result,"img":image_data})
         classified[result].append(image_data)
+
+    db.commit()
 
 
     #해당 카테고리에 파일이 없다면 폴더 보이지 않도록 삭제
@@ -116,4 +128,93 @@ async def predict(request: Request, db: Session = Depends(get_db)):
                                        "predictions": predictions,
                                        "classified":classified})    
 
+@app.get("/animal_images")
+async def animal_images(request: Request, db: Session = Depends(get_db)):
+    animal_list = db.query(models.Animal).all()
+    show_list = []
+    for img in animal_list:
+        image_data = base64.b64encode(img.data).decode('utf-8')
+        show_list.append(image_data)
+    return templates.TemplateResponse("category_show.html",
+                                      {"request": request,"show_list":show_list,"category":"animal"})    
 
+
+@app.get("/human_images")
+async def human_images(request: Request, db: Session = Depends(get_db)):
+    animal_list = db.query(models.Human).all()
+    show_list = []
+    for img in animal_list:
+        image_data = base64.b64encode(img.data).decode('utf-8')
+        show_list.append(image_data)
+    return templates.TemplateResponse("category_show.html",
+                                      {"request": request,"show_list":show_list,"category":"human"}) 
+
+@app.get("/food_images")
+async def food_images(request: Request, db: Session = Depends(get_db)):
+    food_list = db.query(models.Food).all()
+    show_list = []
+    for img in food_list:
+        image_data = base64.b64encode(img.data).decode('utf-8')
+        show_list.append(image_data)
+    return templates.TemplateResponse("category_show.html",
+                                      {"request": request,"show_list":show_list,"category":"food"}) 
+
+@app.get("/docs_images")
+async def docs_images(request: Request, db: Session = Depends(get_db)):
+    docs_list = db.query(models.Docs).all()
+    show_list = []
+    for img in docs_list:
+        image_data = base64.b64encode(img.data).decode('utf-8')
+        show_list.append(image_data)
+    return templates.TemplateResponse("category_show.html",
+                                      {"request": request,"show_list":show_list,"category":"docs"}) 
+
+@app.get("/nature_images")
+async def nature_images(request: Request, db: Session = Depends(get_db)):
+    nature_list = db.query(models.Nature).all()
+    show_list = []
+    for img in nature_list:
+        image_data = base64.b64encode(img.data).decode('utf-8')
+        show_list.append(image_data)
+    return templates.TemplateResponse("category_show.html",
+                                      {"request": request,"show_list":show_list,"category":"nature"}) 
+
+@app.get("/others_images")
+async def others_images(request: Request, db: Session = Depends(get_db)):
+    others_list = db.query(models.Others).all()
+    show_list = []
+    for img in others_list:
+        image_data = base64.b64encode(img.data).decode('utf-8')
+        show_list.append(image_data)
+    return templates.TemplateResponse("category_show.html",
+                                      {"request": request,"show_list":show_list,"category":"others"}) 
+
+@app.get("/save_images")
+async def save_images(request: Request, db: Session = Depends(get_db)):
+    category = request.query_params.get('category', None)
+    if category == "food_images": save_category = db.query(models.Food).all()
+    elif category == "haman_images": save_category = db.query(models.Human).all()
+    elif category == "nature_images": save_category = db.query(models.Nature).all()
+    elif category == "docs_images": save_category = db.query(models.Docs).all()
+    elif category == "animal_images": save_category = db.query(models.Animal).all()
+    elif category == "others_images": save_category = db.query(models.Others).all()
+
+
+    save_folder = category
+    os.makedirs(save_folder, exist_ok=True)
+
+    for item in save_category:
+        bin_img = item.data
+        filename = item.filename
+        # Assuming the 'file_path' field contains the path to the image file
+        image_path = os.path.join(save_folder, filename)
+
+        # Save the binary data to the file
+        with open(image_path, "wb") as img_file:
+            img_file.write(bin_img)
+
+    # Create a zip file containing all the downloaded images
+    shutil.make_archive(save_folder, 'zip', save_folder)
+
+    # Provide the zip file for download
+    return FileResponse(f"{save_folder}.zip", filename=f"{save_folder}.zip", media_type="application/zip")

@@ -20,6 +20,7 @@
         <div class="con_logo">
             <img src="static/img/logo.png" alt="로고">
         </div>
+        
         <div class="content">
            
             <!-- <input type="file" id="file" multiple accept="image/jpeg,image/jpg,image/png"> -->
@@ -32,11 +33,13 @@
                         <SPAN class="note needsclick">(This is just a demo dropzone. Selected 
                         files are <STRONG>not</STRONG> actually uploaded.)</SPAN>
                       </DIV>
-                      <button type="submit">upload</button>
-
+                      
+                    
                     </FORM>
+                    
 
                   </DIV>
+                  <button type="submit" class="upload-button" onclick="uploadFiles()" >upload</button>
             </section>
 
             <DIV id="preview-template" style="display: none;">
@@ -72,6 +75,7 @@
                 </div>
 
         </div>
+        
     </main>
     <script>
    
@@ -117,7 +121,7 @@
             }).then(response => {
                 // 서버 응답을 확인하고 이에 따른 동작 수행
                 if (response.ok) {
-                    // 업로드가 성공하면 /predict 페이지로 이동
+                    // 업로드가 성공하면 /show_image 페이지로 이동
                     window.location.href = "/show_image";
                 } else {
                     // 업로드 실패 시 적절한 처리를 수행
