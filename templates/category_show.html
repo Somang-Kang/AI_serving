@@ -13,7 +13,7 @@
                 margin-top: 20px;
                 padding: 10px 20px;
                 font-size: 16px;
-                background-color: #4CAF50;
+                background-color: rgb(39, 86, 124);
                 color: white;
                 border: none;
                 border-radius: 5px;
@@ -21,7 +21,7 @@
             }
     
             button:hover {
-                background-color: #45a049;
+                background-color: rgb(39, 86, 124);
             }
     
             .image-container {
@@ -42,13 +42,16 @@
             }
     
             .image-container img:hover {
-                border: 1px solid #4CAF50;
+                border: 1px solid rgb(39, 86, 124);
             }
         </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
+
 <body>
     <!-- <button onclick="window.location.href='/save_images'">Save All Images</button> -->
-    <button onclick="saveAllImages()">Save All Images</button>
+    <button onclick="saveAllImages()">
+        <i class="fas fa-download"></i> 전체 이미지 저장</button>
     <div class="image-container">
         
         {% for image_ in show_list %}

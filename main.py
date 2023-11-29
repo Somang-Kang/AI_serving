@@ -1,4 +1,5 @@
 import shutil
+from anyio import Path
 from fastapi import FastAPI, File, HTTPException, UploadFile, Form, Request, Depends, status
 from fastapi.responses import FileResponse, RedirectResponse
 
@@ -33,7 +34,7 @@ class_name = ["a photo of a food","a photo of a landscape", "a photo of a person
 
 class_dict = {"a photo of a food":"food","a photo of a landscape":"nature", "a photo of a person":"human","a photo of people":"human", 
               "a photo of a document":"docs", "a photo of an animal":"animal","a photo of animals":"animal","a photo of people in landscape":"human","a photo of nature":"nature","others":"others"}
-
+classified = {"human":[],"nature":[],"food":[],"docs":[],"animal":[],"others":[]}
 
 
 abs_path = os.path.dirname(os.path.realpath(__file__))
@@ -81,7 +82,7 @@ async def show_image(request: Request,db: Session = Depends(get_db)):
 async def predict(request: Request, db: Session = Depends(get_db)):
     categoreyes_list = db.query(models.Categoreyes).all()
     predictions = []
-    classified = {"human":[],"nature":[],"food":[],"docs":[],"animal":[],"others":[]}
+    
     for idx in range(len(categoreyes_list)):
         categoreyes=categoreyes_list[idx]
         # 1. make buffer from bytes
@@ -107,8 +108,8 @@ async def predict(request: Request, db: Session = Depends(get_db)):
 
         else:
             result = "others"
-            db.add(models.Others(data=categoreyes.data, filename=categoreyes.filename))
-        
+        #db.add(models.Categoreyes(category=result))
+        #print("result: ", result)
         predictions.append({"filename": categoreyes.filename, "result": result,"img":image_data})
         classified[result].append(image_data)
 
@@ -192,29 +193,56 @@ async def others_images(request: Request, db: Session = Depends(get_db)):
 @app.get("/save_images")
 async def save_images(request: Request, db: Session = Depends(get_db)):
     category = request.query_params.get('category', None)
+    allfolders = False
     if category == "food_images": save_category = db.query(models.Food).all()
     elif category == "haman_images": save_category = db.query(models.Human).all()
     elif category == "nature_images": save_category = db.query(models.Nature).all()
     elif category == "docs_images": save_category = db.query(models.Docs).all()
     elif category == "animal_images": save_category = db.query(models.Animal).all()
     elif category == "others_images": save_category = db.query(models.Others).all()
+    else: allfolders = True
+
+    if allfolders:
+        save_folder = "모든사진"
+        for class_name in classified.keys():
+            if len(classified[class_name])!=0:
+                os.makedirs(f"{save_folder}/{class_name}", exist_ok=True)
+
+        save_categor = db.query(models.Categoreyes).all()
+        for item in save_categor:
+            bin_img = item.data
+            filename = item.filename
+            category = item.category
+
+            print(filename)
+            print(category)
+
+            # Use Path to construct the path safely
+            image_path = Path(save_folder).joinpath(category, filename)
+            with open(image_path, "wb") as img_file:
+                img_file.write(bin_img)
+        shutil.make_archive(save_folder, 'zip', save_folder)
+
+        # Provide the zip file for download
+        return FileResponse(f"{save_folder}.zip", filename=f"{save_folder}.zip", media_type="application/zip")
 
 
-    save_folder = category
-    os.makedirs(save_folder, exist_ok=True)
+    else:
+        save_folder = category
+        os.makedirs(save_folder, exist_ok=True)
 
-    for item in save_category:
-        bin_img = item.data
-        filename = item.filename
-        # Assuming the 'file_path' field contains the path to the image file
-        image_path = os.path.join(save_folder, filename)
+        for item in save_category:
+            bin_img = item.data
+            filename = item.filename
+            # Assuming the 'file_path' field contains the path to the image file
+            image_path = os.path.join(save_folder, filename)
 
-        # Save the binary data to the file
-        with open(image_path, "wb") as img_file:
-            img_file.write(bin_img)
+            # Save the binary data to the file
+            with open(image_path, "wb") as img_file:
+                img_file.write(bin_img)
 
-    # Create a zip file containing all the downloaded images
-    shutil.make_archive(save_folder, 'zip', save_folder)
+        # Create a zip file containing all the downloaded images
+        shutil.make_archive(save_folder, 'zip', save_folder)
 
-    # Provide the zip file for download
-    return FileResponse(f"{save_folder}.zip", filename=f"{save_folder}.zip", media_type="application/zip")
+        # Provide the zip file for download
+        return FileResponse(f"{save_folder}.zip", filename=f"{save_folder}.zip", media_type="application/zip")

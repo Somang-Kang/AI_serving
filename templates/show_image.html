@@ -5,6 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Document</title>
         <style>
+            h1 {
+                text-align: center; /* 가운데 정렬 */
+                font-size: 44px; /* 원하는 폰트 크기로 설정 */
+                color: #333333; /* 글자색 설정 (원하는 색상으로 변경 가능) */
+            }
             body {
                 text-align: center;
             }
@@ -13,7 +18,7 @@
                 margin-top: 20px;
                 padding: 10px 20px;
                 font-size: 16px;
-                background-color: #4CAF50;
+                background-color: rgb(39, 86, 124);
                 color: white;
                 border: none;
                 border-radius: 5px;
@@ -21,7 +26,7 @@
             }
     
             button:hover {
-                background-color: #45a049;
+                background-color: rgb(39, 86, 124);
             }
     
             .image-container {
@@ -42,12 +47,14 @@
             }
     
             .image-container img:hover {
-                border: 1px solid #4CAF50;
+                border: 1px solid rgb(39, 86, 124);
             }
         </style>
     </head>
 <body>
-    <button onclick="window.location.href='/predict'">Classification</button>
+    <h1>My Library</h1>
+
+    <button onclick="window.location.href='/predict'">사진 분류하기</button>
     <div class="image-container">
         {% for image_ in show_list %}
             <img src="data:image/png;base64,{{ image_|b64encode }}">

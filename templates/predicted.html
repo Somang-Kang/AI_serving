@@ -14,12 +14,13 @@
             left: 50%;
             transform: translateX(-50%);
             padding: 15px;
-            background-color: #4CAF50;
+            background-color: rgb(39, 86, 124);
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 16px;
+            
         }
 
         .category-box {
@@ -70,13 +71,16 @@
         }
 
         .image-container img:hover {
-            border: 1px solid #4CAF50;
+            border: 1px solid rgb(39, 86, 124);
         }
     </style>
     <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <button onclick="window.location.href='/save_images'" class="save-button">Save All Folders</button>
+    <button onclick="window.location.href='/save_images'" class="save-button">
+        <i class="fas fa-download"></i> 전체 폴더 저장
+    </button>
     {% for key, value in classified.items() %}
         <div class="category-box">
             <a href="{% if key == 'human' %}/human_images
@@ -86,14 +90,10 @@
                         {% elif key == 'others' %}/others_images
                         {% elif key == 'food' %}/food_images
                         {% endif %}">
-                <p>{{ key }}</p>
-                <!-- Add other content here if needed -->
+                <!-- <p>{{ key }}</p> -->
+                <p><i class="fas fa-folder"></i> {{ key }}</p>
             </a>
-            <!-- <div class="image-container">
-                {% for v in value %}
-                    <img src="data:image/png;base64,{{ v|b64encode }}" >
-                {% endfor %}
-            </div> -->
+
         </div>
     {% endfor %}
 </body>
